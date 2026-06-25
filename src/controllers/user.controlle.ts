@@ -49,11 +49,15 @@ export const registrationUser = CatchAsyncError(
           template: templatePath,
           data,
         });
+
+        res.status(201).json({
+          success: true,
+          message: "Activation email sent successfully",
+          activationToken: activationToken.token,
+        });
       } catch (error) {
         next(new ErrorHandler("Failed to send activation email", 500));
       }
-
-
     } catch (error) {
       next(
         new ErrorHandler(
@@ -80,3 +84,53 @@ export const createActivationToken = (user: any): IActivationToken => {
 
   return { token, activationCode };
 };
+
+interface IActivationRequestBody {
+  activationToken: string;
+  activationCode: string;
+}
+
+export const activateUser = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { activationToken, activationCode } =
+        req.body as IActivationRequestBody;
+
+      const decoded = jwt.verify(
+        activationToken,
+        process.env.ACTIVATION_SECRET as Secret,
+      ) as { user: IRegistirationBody; activationCode: string };
+
+      if (decoded.activationCode !== activationCode) {
+        return next(new ErrorHandler("Invalid activation code", 400));
+      }
+
+      const { name, email, password } = decoded.user;
+
+      const isEmailExist = await User.findOne({ email });
+
+      if (isEmailExist) {
+        return next(new ErrorHandler("Email already exist", 400));
+      }
+
+      const newUser = await User.create({
+        name,
+        email,
+        password,
+      });
+
+      res.status(201).json({
+        success: true,
+        message: "User activated successfully",
+        user: newUser,
+      });
+    } catch (error) {
+      next(
+        new ErrorHandler(
+          error instanceof Error ? error.message : "Something went wrong",
+          400,
+        ),
+      );
+    }
+  },
+);

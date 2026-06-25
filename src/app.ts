@@ -7,6 +7,7 @@ import express, {
 } from "express";
 import cors from "cors";
 import ErrorMiddleware from "./middleware/error";
+import userRouter from "./routes/user.route";
 
 function createApplication(): Application {
   const app: Application = express();
@@ -30,6 +31,8 @@ function createApplication(): Application {
       message: "Api is working!",
     });
   });
+
+  app.use("/api/v1", userRouter);
 
   app.all("/{*any}", (req: Request, res: Response, next: NextFunction) => {
     const error = new Error(

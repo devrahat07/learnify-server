@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import path from "path/win32";
+import path from "node:path";
 import ejs from "ejs";
 
 interface EmailOptions {
