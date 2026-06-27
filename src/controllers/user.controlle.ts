@@ -2,11 +2,14 @@ import { NextFunction, Request, Response } from "express";
 import { CatchAsyncError } from "../middleware/catchAsyncErrors";
 import User from "../models/user.model";
 import ErrorHandler from "../utils/ErrorHandler";
-import jwt, { Secret } from "jsonwebtoken";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import ejs from "ejs";
 import path from "node:path";
 import sendMail from "../utils/sendMail";
-import sendToken from "../utils/jwt";
+import sendToken, {
+  accessTokenOptions,
+  refreshTokenOptions,
+} from "../utils/jwt";
 import { redis } from "../utils/redis";
 
 interface IRegistirationBody {
@@ -192,16 +195,56 @@ export const logoutUser = CatchAsyncError(
   },
 );
 
-export const authorizeRoles = (...roles: string[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    if (!roles.includes(req.user?.role) || "") {
-      return next(
-        new ErrorHandler(
-          `Role: ${req.user.role} is not allowed to access this resource`,
-          403,
-        ),
-      );
+export const updateAccessToken = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const refresh_Token = req.cookies.refreshToken as string;
+
+    const decoded = jwt.verify(
+      refresh_Token,
+      process.env.REFRESH_TOKEN as string,
+    ) as JwtPayload;
+
+    console.log(decoded)
+
+    if (!decoded) {
+      return next(new ErrorHandler("Could not refresh token", 400));  
     }
-    next();
-  };
-};
+
+    const session = await redis.get(decoded.id as string);
+
+    if (!session) {
+      return next(new ErrorHandler("Could not refresh token", 400));
+    }
+
+    const user = JSON.parse(session);
+
+    const accessToken = jwt.sign(
+      { id: user._id },
+      process.env.ACCESS_TOKEN as string,
+      {
+        expiresIn: "5m",
+      },
+    );
+
+    const refreshToken = jwt.sign(
+      { id: user._id },
+      process.env.REFRESH_TOKEN as string,
+      {
+        expiresIn: "5m",
+      },
+    );
+
+
+    res
+      .status(200)
+      .cookie("accessToken", accessToken, accessTokenOptions)
+      .cookie("refreshToken", refreshToken, refreshTokenOptions)
+      .json({
+        success: true,
+        message: "Access token!",
+        user,
+        accessToken,
+        refreshToken,
+      });
+  },
+);

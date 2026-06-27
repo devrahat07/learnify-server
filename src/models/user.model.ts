@@ -85,11 +85,15 @@ userSchema.pre("save", async function () {
 });
 
 userSchema.methods.SignAccessToken = function (): string {
-  return jwt.sign({ id: this._id }, process.env.ACCESS_TOKEN!);
+  return jwt.sign({ id: this._id }, process.env.ACCESS_TOKEN!, {
+    expiresIn: "5",
+  });
 };
 
 userSchema.methods.SignRefreshToken = function (): string {
-  return jwt.sign({ id: this._id }, process.env.REFRESH_TOKEN!);
+  return jwt.sign({ id: this._id }, process.env.REFRESH_TOKEN!, {
+    expiresIn: "7d",
+  });
 };
 
 userSchema.methods.comparePassword = async function (
