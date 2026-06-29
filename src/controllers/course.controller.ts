@@ -4,20 +4,22 @@ import cloudinary from "cloudinary";
 import { createCourse } from "../services/course.service";
 
 export const uploadCourse = CatchAsyncError(
-  async (req: Request, res: Response,next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const data = req.body;
-    const thumbnail = data.thumbnail;
-    if (thumbnail) {
-      const myCloud = await cloudinary.v2.uploader.upload(thumbnail, {
+    if (data.thumbnail) {
+      const myCloud = await cloudinary.v2.uploader.upload(data.thumbnail, {
         folder: "courses",
       });
-
       data.thumbnail = {
         public_id: myCloud.public_id,
-        url: myCloud.secure_url
-      }
+        url: myCloud.secure_url,
+      };
     }
-
-    createCourse(data,res,next)
+    const course = await createCourse(data);
+    res.status(201).json({
+      success: true,
+      message: "Course created successfully!",
+      course,
+    });
   },
 );
