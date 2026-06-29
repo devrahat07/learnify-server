@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { CatchAsyncError } from "../middleware/catchAsyncErrors";
 import cloudinary from "cloudinary";
 import { createCourse } from "../services/course.service";
+import CourseModel from "../models/course.model";
+import ErrorHandler from "../utils/ErrorHandler";
 
 export const uploadCourse = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -21,5 +23,70 @@ export const uploadCourse = CatchAsyncError(
       message: "Course created successfully!",
       course,
     });
+  },
+);
+
+export const editCourse = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const data = req.body;
+    const thumbnail = data.thumbnail;
+    if (thumbnail) {
+      await cloudinary.v2.uploader.destroy(data.thumbnail.public_id);
+      const myCloud = await cloudinary.v2.uploader.upload(thumbnail, {
+        folder: "courses",
+      });
+      data.thumbnail = {
+        public_id: myCloud.public_id,
+        url: myCloud.secure_url,
+      };
+    }
+    const courseId = req.params.id;
+    if (!courseId) {
+      throw new ErrorHandler("Course not found", 404);
+    }
+    const course = await CourseModel.findByIdAndUpdate(courseId, data, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(200).json({
+      success: true,
+      message: "Course updated successfully!",
+      course,
+    });
+  },
+);
+
+export const getSingleCourse = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const courseId = req.params.id;
+    if (!courseId) {
+      throw new ErrorHandler("Course not found", 404);
+    }
+    const course = await CourseModel.findById(courseId).select(
+      "-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links",
+    );
+    if (!course) {
+      throw new ErrorHandler("Course not found", 404);
+    }
+    res.status(200).json({
+      success: true,
+      message: "Course fetched successfully!",
+      course,
+    });
+  },
+);
+
+export const getAllCourses = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+   try {
+     const courses = await CourseModel.find().select("-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links");
+     res.status(200).json({
+       success: true,
+       courses,
+       message: "Courses fetched successfully!",
+     });
+   } catch (error) {
+    next(new ErrorHandler("Failed to get courses", 500));
+   }
   },
 );

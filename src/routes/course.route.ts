@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { uploadCourse } from "../controllers/course.controller";
+import {
+  editCourse,
+  getAllCourses,
+  getSingleCourse,
+  uploadCourse,
+} from "../controllers/course.controller";
 import { authorizeRoles, isAuthenticated } from "../middleware/auth";
 
 const router = Router();
@@ -10,5 +15,15 @@ router.post(
   authorizeRoles("admin"),
   uploadCourse,
 );
+
+router.put(
+  "/edit-course/:id",
+  isAuthenticated,
+  authorizeRoles("admin"),
+  editCourse,
+);
+
+router.get("/get-single-course/:id", isAuthenticated, getSingleCourse);
+router.get("/get-all-courses", isAuthenticated, getAllCourses);
 
 export default router;
