@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  addAnswer,
   addQuestion,
   editCourse,
   getAllCourses,
@@ -30,5 +31,6 @@ router.get("/get-all-courses", isAuthenticated, getAllCourses);
 router.get("/get-course-content/:id", isAuthenticated, getCourseByUser);
 router.post("/add-question", isAuthenticated, addQuestion);
 router.put("/add-question", isAuthenticated, addQuestion);
+router.put("/add-answer", isAuthenticated, addAnswer);
 
 export default router;

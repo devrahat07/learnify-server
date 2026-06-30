@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Reply to Your Question</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f4f7fb;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #333;
+    }
+
+    .container {
+      width: 100%;
+      padding: 40px 0;
+    }
+
+    .card {
+      max-width: 600px;
+      margin: auto;
+      background: #ffffff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,.08);
+    }
+
+    .header {
+      background: #2563eb;
+      color: #fff;
+      text-align: center;
+      padding: 30px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 26px;
+    }
+
+    .content {
+      padding: 35px;
+    }
+
+    .content h2 {
+      margin-top: 0;
+      color: #222;
+    }
+
+    .course {
+      background: #f8fafc;
+      border-left: 4px solid #2563eb;
+      padding: 15px;
+      margin: 25px 0;
+      border-radius: 6px;
+    }
+
+    .button {
+      display: inline-block;
+      background: #2563eb;
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 6px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: #888;
+      font-size: 13px;
+      background: #fafafa;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="card">
+
+    <div class="header">
+      <h1>💬 New Reply Received</h1>
+    </div>
+
+    <div class="content">
+
+      <h2>Hello <%= name %>,</h2>
+
+      <p>
+        Great news! Someone has replied to your question in one of your course discussions.
+      </p>
+
+      <div class="course">
+        <strong>Course:</strong> <%= courseName %><br><br>
+
+        <strong>Your Question:</strong><br>
+        <%= question %><br><br>
+
+        <strong>Reply:</strong><br>
+        <%= reply %>
+      </div>
+
+      <p>
+        Continue the discussion and keep learning with the community.
+      </p>
+
+      <a href="<%= courseUrl %>" class="button">
+        View Discussion
+      </a>
+
+    </div>
+
+    <div class="footer">
+      <p>
+        Thank you for being part of <strong>Learnify</strong>.
+      </p>
+
+      <p>
+        © <%= new Date().getFullYear() %> Learnify. All rights reserved.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
