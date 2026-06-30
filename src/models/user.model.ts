@@ -15,9 +15,7 @@ export interface IUser extends Document {
   };
   role: string;
   isVerified: boolean;
-  courses: Array<{
-    courseId: string;
-  }>;
+  courses: mongoose.Types.ObjectId[];
   comparePassword: (enteredPassword: string) => Promise<boolean>;
   SignAccessToken: () => string;
   SignRefreshToken: () => string;
@@ -69,7 +67,8 @@ const userSchema = new mongoose.Schema<IUser>(
     },
     courses: [
       {
-        courseId: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Course",
       },
     ],
   },

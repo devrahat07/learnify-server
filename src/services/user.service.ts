@@ -3,16 +3,16 @@ import User from "../models/user.model";
 import { redis } from "../utils/redis";
 
 export const getUserById = async (id: string, res: Response) => {
-  const userJson = await redis.get(id);
+  const user = await User.findById(id);
 
-  if (!userJson) {
+  if (!user) {
     return res.status(404).json({
       success: false,
       message: "User not found",
     });
   }
 
-  const user = JSON.parse(userJson);
+  await redis.set(id.toString(), JSON.stringify(user));
 
   res.status(200).json({
     success: true,

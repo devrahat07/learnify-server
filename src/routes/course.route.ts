@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   editCourse,
   getAllCourses,
+  getCourseByUser,
   getSingleCourse,
   uploadCourse,
 } from "../controllers/course.controller";
@@ -25,5 +26,6 @@ router.put(
 
 router.get("/get-single-course/:id", isAuthenticated, getSingleCourse);
 router.get("/get-all-courses", isAuthenticated, getAllCourses);
+router.get("/get-course-content/:id", isAuthenticated, getCourseByUser);
 
 export default router;
