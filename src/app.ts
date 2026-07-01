@@ -9,6 +9,8 @@ import cors from "cors";
 import ErrorMiddleware from "./middleware/error";
 import userRouter from "./routes/user.route";
 import courseRouter from "./routes/course.route";
+import orderRoute from "./routes/order.route";
+import notificationRoute from "./routes/notification.route";
 
 function createApplication(): Application {
   const app: Application = express();
@@ -35,7 +37,9 @@ function createApplication(): Application {
 
   app.use("/api/v1", userRouter);
   app.use("/api/v1", courseRouter);
-  
+  app.use("/api/v1", orderRoute);
+  app.use("/api/v1", notificationRoute);
+
   app.all("/{*any}", (req: Request, res: Response, next: NextFunction) => {
     const error = new Error(
       `Cannot ${req.method} ${req.originalUrl}. The requested route does not exist.`,
