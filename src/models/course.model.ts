@@ -8,7 +8,7 @@ interface IComment extends Document {
 }
 
 interface IReview extends Document {
-  user: mongoose.Types.ObjectId;
+  user: IUser;
   rating: number;
   comment: string;
   commentReplies: IComment[];
